@@ -17,8 +17,6 @@ libprotobuf:
 libuuid:
 - 2.32.1
 pin_run_as_build:
-  libprotobuf:
-    max_pin: x.x
   libuuid:
     max_pin: x
   zeromq:
