@@ -13,7 +13,7 @@ cxx_compiler:
 cxx_compiler_version:
 - '9'
 libprotobuf:
-- '3.10'
+- '3.11'
 libuuid:
 - 2.32.1
 macos_machine:
@@ -21,8 +21,6 @@ macos_machine:
 macos_min_version:
 - '10.9'
 pin_run_as_build:
-  libprotobuf:
-    max_pin: x.x
   libuuid:
     max_pin: x
   zeromq:
