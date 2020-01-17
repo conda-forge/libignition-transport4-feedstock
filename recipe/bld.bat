@@ -16,7 +16,3 @@ if errorlevel 1 exit 1
 :: Install.
 cmake --build . --config Release --target install
 if errorlevel 1 exit 1
-
-:: Test.
-ctest -C Release -E "INTEGRATION|PERFORMANCE|REGRESSION|UNIT_Discovery_TEST|UNIT_ign_TEST|UNIT_Node_TEST"
-if errorlevel 1 exit 1
