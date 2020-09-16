@@ -8,11 +8,11 @@ package:
   version: {{ version }}
 
 source:
-  - url: https://bitbucket.org/ignitionrobotics/ign-transport/get/ignition-transport{{ major_version }}_{{ version }}.tar.gz
-    sha256: 9e569b5f262aa967712a0e4bab3962d9d210cfd61d442d5798f3cc550e8adbe7
+  - url: https://github.com/ignitionrobotics/ign-transport/archive/ignition-transport{{ major_version }}_{{ version }}.tar.gz
+    sha256: 83a703b584a2ec75fa7afe7e0829dd3e9e94a63abff76501dfe2e9839e891630
 
 build:
-  number: 1
+  number: 2
   skip: true  # [win and vc<14]
   run_exports:
     - {{ pin_subpackage(name, max_pin='x.x') }}
@@ -51,7 +51,7 @@ test:
     - if exist %PREFIX%\\Library\\lib\\cmake\\ignition-transport{{ major_version }}\\ignition-transport{{ major_version }}-config.cmake (exit 0) else (exit 1)  # [win]
 
 about:
-  home: https://bitbucket.org/ignitionrobotics/ign-transport
+  home: https://github.com/ignitionrobotics/ign-transport
   license: Apache-2.0
   license_file: LICENSE
   summary: 'Ignition Transport'
