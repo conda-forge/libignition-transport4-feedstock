@@ -1,5 +1,5 @@
 {% set base_name = "libignition-transport" %}
-{% set version = "8.0.0" %}
+{% set version = "8.1.0" %}
 {% set major_version = version.split('.')[0] %}
 {% set name = base_name + major_version %}
 
@@ -9,10 +9,10 @@ package:
 
 source:
   - url: https://github.com/ignitionrobotics/ign-transport/archive/ignition-transport{{ major_version }}_{{ version }}.tar.gz
-    sha256: 83a703b584a2ec75fa7afe7e0829dd3e9e94a63abff76501dfe2e9839e891630
+    sha256: caea46e51e9ebb4ad27f12ad004ed98d7b4011b601c07e6680c702f19da5cadb
 
 build:
-  number: 2
+  number: 0
   skip: true  # [win and vc<14]
   run_exports:
     - {{ pin_subpackage(name, max_pin='x.x') }}
@@ -54,7 +54,7 @@ about:
   home: https://github.com/ignitionrobotics/ign-transport
   license: Apache-2.0
   license_file: LICENSE
-  summary: 'Ignition Transport'
+  summary: Ignition Transport
 
 extra:
   recipe-maintainers:
