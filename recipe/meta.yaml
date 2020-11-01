@@ -27,13 +27,13 @@ requirements:
     - cmake
     - pkg-config
   host:
-    - libignition-msgs5
+    - libignition-msgs6
     - cppzmq
     - zeromq
     - libuuid                            # [not win]
     - libprotobuf                        # [not win]
   run:
-    - libignition-msgs5
+    - libignition-msgs6
     - cppzmq
     - zeromq
     - libuuid                            # [not win]
