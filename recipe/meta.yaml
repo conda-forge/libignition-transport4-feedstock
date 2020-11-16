@@ -12,7 +12,7 @@ source:
     sha256: ca97dcf6985d5b37010468b5006f3d578676757828cad6c7007e390d9974c5d0
 
 build:
-  number: 2
+  number: 3
   skip: true  # [win and vc<14]
   run_exports:
     - {{ pin_subpackage(name, max_pin='x') }}
@@ -27,18 +27,19 @@ requirements:
     - cmake
     - pkg-config
   host:
+    - libignition-cmake2
     - libignition-msgs6
     - libignition-tools1
     - cppzmq
     - zeromq
-    - libuuid                            # [not win]
+    - libuuid                            # [linux]
     - libprotobuf                        # [not win]
   run:
     - libignition-msgs6
     - libignition-tools1
     - cppzmq
     - zeromq
-    - libuuid                            # [not win]
+    - libuuid                            # [linux]
     - libprotobuf                        # [not win]
   run_constrained:
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
