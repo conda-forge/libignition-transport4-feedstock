@@ -1,5 +1,5 @@
-About libignition-transport9
-============================
+About libignition-transport10
+=============================
 
 Home: https://github.com/ignitionrobotics/ign-transport
 
@@ -88,27 +88,27 @@ Current release info
 
 | Name | Downloads | Version | Platforms |
 | --- | --- | --- | --- |
-| [![Conda Recipe](https://img.shields.io/badge/recipe-libignition--transport9-green.svg)](https://anaconda.org/conda-forge/libignition-transport9) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/libignition-transport9.svg)](https://anaconda.org/conda-forge/libignition-transport9) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/libignition-transport9.svg)](https://anaconda.org/conda-forge/libignition-transport9) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/libignition-transport9.svg)](https://anaconda.org/conda-forge/libignition-transport9) |
+| [![Conda Recipe](https://img.shields.io/badge/recipe-libignition--transport10-green.svg)](https://anaconda.org/conda-forge/libignition-transport10) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/libignition-transport10.svg)](https://anaconda.org/conda-forge/libignition-transport10) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/libignition-transport10.svg)](https://anaconda.org/conda-forge/libignition-transport10) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/libignition-transport10.svg)](https://anaconda.org/conda-forge/libignition-transport10) |
 
-Installing libignition-transport9
-=================================
+Installing libignition-transport10
+==================================
 
-Installing `libignition-transport9` from the `conda-forge` channel can be achieved by adding `conda-forge` to your channels with:
+Installing `libignition-transport10` from the `conda-forge` channel can be achieved by adding `conda-forge` to your channels with:
 
 ```
 conda config --add channels conda-forge
 ```
 
-Once the `conda-forge` channel has been enabled, `libignition-transport9` can be installed with:
+Once the `conda-forge` channel has been enabled, `libignition-transport10` can be installed with:
 
 ```
-conda install libignition-transport9
+conda install libignition-transport10
 ```
 
-It is possible to list all of the versions of `libignition-transport9` available on your platform with:
+It is possible to list all of the versions of `libignition-transport10` available on your platform with:
 
 ```
-conda search libignition-transport9 --channel conda-forge
+conda search libignition-transport10 --channel conda-forge
 ```
 
 
@@ -150,17 +150,17 @@ Terminology
                   produce the finished article (built conda distributions)
 
 
-Updating libignition-transport9-feedstock
-=========================================
+Updating libignition-transport10-feedstock
+==========================================
 
-If you would like to improve the libignition-transport9 recipe or build a new
+If you would like to improve the libignition-transport10 recipe or build a new
 package version, please fork this repository and submit a PR. Upon submission,
 your changes will be run on the appropriate platforms to give the reviewer an
 opportunity to confirm that the changes result in a successful build. Once
 merged, the recipe will be re-built and uploaded automatically to the
 `conda-forge` channel, whereupon the built conda packages will be available for
 everybody to install and use from the `conda-forge` channel.
-Note that all branches in the conda-forge/libignition-transport9-feedstock are
+Note that all branches in the conda-forge/libignition-transport10-feedstock are
 immediately built and any created packages are uploaded, so PRs should be based
 on branches in forks and branches in the main repository should only be used to
 build distinct package versions.
