@@ -25,15 +25,14 @@ requirements:
     - pkg-config
   host:
     - libignition-cmake2
-    - libignition-msgs6
+    - libignition-msgs7
     - libignition-tools1
+    - libignition-utils1
     - cppzmq
     - zeromq
     - libuuid                            # [linux]
     - libprotobuf
   run:
-    - libignition-msgs6
-    - libignition-tools1
     - cppzmq
     - zeromq
     - libuuid                            # [linux]
