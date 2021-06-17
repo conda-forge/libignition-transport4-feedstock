@@ -32,10 +32,7 @@ requirements:
     - libuuid                            # [linux]
     - libprotobuf
   run:
-    - libignition-msgs5
-    - libignition-tools1
     - cppzmq
-    - zeromq
     - libuuid                            # [linux]
   run_constrained:
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
