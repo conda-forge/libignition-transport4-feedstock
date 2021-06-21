@@ -12,7 +12,7 @@ source:
     sha256: 3c0ebe70a4343e5206bd145016350b925be3a0619a10e7dcb6e8d48326dda8f1
 
 build:
-  number: 0
+  number: 1
   run_exports:
     - {{ pin_subpackage(name, max_pin='x') }}
 
@@ -34,7 +34,6 @@ requirements:
     - libprotobuf
   run:
     - cppzmq
-    - zeromq
     - libuuid                            # [linux]
   run_constrained:
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
