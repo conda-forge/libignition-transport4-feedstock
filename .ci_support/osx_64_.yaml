@@ -17,8 +17,12 @@ libprotobuf:
 macos_machine:
 - x86_64-apple-darwin13.4.0
 pin_run_as_build:
+  sqlite:
+    max_pin: x
   zeromq:
     max_pin: x.x
+sqlite:
+- '3'
 target_platform:
 - osx-64
 zeromq:
