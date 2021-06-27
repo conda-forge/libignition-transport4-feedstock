@@ -12,7 +12,7 @@ source:
     sha256: b1382d5a5f6e3df330adb77519799f482457cad791cb48d37f8bd9066fa93302
 
 build:
-  number: 4
+  number: 5
   run_exports:
     - {{ pin_subpackage(name, max_pin='x') }}
 
@@ -31,12 +31,9 @@ requirements:
     - zeromq
     - libuuid                            # [linux]
     - libprotobuf
+    - sqlite
   run:
-    - libignition-msgs6
-    - libignition-tools1
     - cppzmq
-    - zeromq
-    - libuuid                            # [linux]
   run_constrained:
     - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx]
 
