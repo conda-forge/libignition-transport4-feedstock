@@ -25,7 +25,7 @@ requirements:
     - pkg-config
   host:
     - libignition-cmake2
-    - libignition-msgs7
+    - libignition-msgs8
     - libignition-tools1
     - libignition-utils1
     - cppzmq
