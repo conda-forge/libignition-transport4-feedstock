@@ -1,5 +1,5 @@
 {% set base_name = "libignition-transport" %}
-{% set version = "10.0.0" %}
+{% set version = "10.2.0" %}
 {% set major_version = version.split('.')[0] %}
 {% set name = base_name + major_version %}
 
