@@ -9,7 +9,7 @@ package:
 
 source:
   - url: https://github.com/ignitionrobotics/ign-transport/archive/ignition-transport{{ major_version }}_{{ version }}.tar.gz
-    sha256: e1acb375098415630e68709352e98cf7b9b843fad21b22f5305a8325af8618a1
+    sha256: eacdf5676b31d199d9bd275d23073236950c7b19bc940158266ffd1365921eab
 
 build:
   number: 0
