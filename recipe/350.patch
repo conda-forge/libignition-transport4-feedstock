@@ -1,0 +1,39 @@
+From 3e88511e904dff529145427eb707653d64900d54 Mon Sep 17 00:00:00 2001
+From: Silvio Traversaro <silvio@traversaro.it>
+Date: Mon, 29 Aug 2022 09:14:03 +0200
+Subject: [PATCH] Backport Windows fix from main branch
+
+Backport from https://github.com/gazebosim/gz-transport/pull/250
+---
+ include/ignition/transport/TopicStatistics.hh | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/include/ignition/transport/TopicStatistics.hh b/include/ignition/transport/TopicStatistics.hh
+index bffdebd0a..16b942a25 100644
+--- a/include/ignition/transport/TopicStatistics.hh
++++ b/include/ignition/transport/TopicStatistics.hh
+@@ -19,12 +19,24 @@
+ 
+ #include <ignition/msgs/statistic.pb.h>
+ 
++#include <algorithm>
+ #include <limits>
+ #include <memory>
+ #include <string>
+ #include "ignition/transport/config.hh"
+ #include "ignition/transport/Export.hh"
+ 
++#ifdef _WIN32
++#ifndef NOMINMAX
++  #define NOMINMAX
++#endif
++#ifdef min
++  #undef min
++  #undef max
++#endif
++#include <windows.h>
++#endif
++
+ namespace ignition
+ {
+   namespace transport
