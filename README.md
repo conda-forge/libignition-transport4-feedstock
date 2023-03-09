@@ -1,11 +1,11 @@
-About libignition-transport11
-=============================
+About libignition-transport11-feedstock
+=======================================
+
+Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/libignition-transport4-feedstock/blob/main/LICENSE.txt)
 
 Home: https://github.com/ignitionrobotics/ign-transport
 
 Package license: Apache-2.0
-
-Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/libignition-transport4-feedstock/blob/main/LICENSE.txt)
 
 Summary: Ignition Transport
 
