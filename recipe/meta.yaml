@@ -14,7 +14,7 @@ source:
       - 405.patch
 
 build:
-  number: 0
+  number: 1
   run_exports:
     - {{ pin_subpackage(name, max_pin='x') }}
 
@@ -32,6 +32,7 @@ requirements:
     - cppzmq
     - zeromq
     - libuuid                            # [linux]
+    - libabseil
     - libprotobuf
   run:
     - cppzmq
