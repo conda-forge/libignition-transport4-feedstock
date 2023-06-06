@@ -33,7 +33,7 @@ requirements:
     - cppzmq
     - zeromq
     - libuuid                            # [linux]
-    - libabsseil
+    - libabseil
     - libprotobuf
     - sqlite
   run:
