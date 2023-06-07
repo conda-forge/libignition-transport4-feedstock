@@ -1,0 +1,29 @@
+diff --git a/include/gz/transport/TopicStatistics.hh b/include/gz/transport/TopicStatistics.hh
+index 3bdf5a755..c547d5c0d 100644
+--- a/include/gz/transport/TopicStatistics.hh
++++ b/include/gz/transport/TopicStatistics.hh
+@@ -19,12 +19,24 @@
+ 
+ #include <gz/msgs/statistic.pb.h>
+ 
++#include <algorithm>
+ #include <limits>
+ #include <memory>
+ #include <string>
+ #include "gz/transport/config.hh"
+ #include "gz/transport/Export.hh"
+ 
++#ifdef _WIN32
++#ifndef NOMINMAX
++  #define NOMINMAX
++#endif
++#ifdef min
++  #undef min
++  #undef max
++#endif
++#include <windows.h>
++#endif
++
+ namespace ignition
+ {
+   namespace transport
