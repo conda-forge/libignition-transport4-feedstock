@@ -1,5 +1,5 @@
 {% set base_name = "libignition-transport" %}
-{% set version = "11.4.0" %}
+{% set version = "11.4.1" %}
 {% set major_version = version.split('.')[0] %}
 {% set name = base_name + major_version %}
 
@@ -9,12 +9,12 @@ package:
 
 source:
   - url: https://github.com/ignitionrobotics/ign-transport/archive/ignition-transport{{ major_version }}_{{ version }}.tar.gz
-    sha256: cf9f499cb9ba4d6c8d94f307b854ad4ce53ee7393378b9626c517ca9b01768d6
+    sha256: dad9553f68076c466a5fa4d575c1910b13a6b32e7dfe3e29e81f93ae5bec07ac
     patches:
       - 405.patch
 
 build:
-  number: 2
+  number: 0
   run_exports:
     - {{ pin_subpackage(name, max_pin='x') }}
 
