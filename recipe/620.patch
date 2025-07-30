@@ -1,0 +1,442 @@
+From ab3511297c1d3c72b16db292ba0188bb5875f723 Mon Sep 17 00:00:00 2001
+From: "mergify[bot]" <37929162+mergify[bot]@users.noreply.github.com>
+Date: Wed, 30 Apr 2025 19:51:47 +0200
+Subject: [PATCH] Fix compatibility with protobuf v30 (cpp 6.30.0) - similar to
+ gz-msgs #499 (backport #615) (#620)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* Fix compatibility with protobuf v30 (cpp 6.30.0) - similar to gz-msgs #499 (#615)
+Signed-off-by: Carlos Agüero <caguero@openrobotics.org>
+---
+ include/gz/transport/RepHandler.hh            |  4 ++--
+ include/gz/transport/ReqHandler.hh            |  8 ++++----
+ include/gz/transport/SubscriptionHandler.hh   |  2 +-
+ include/gz/transport/detail/Node.hh           | 19 ++++++++++++-------
+ parameters/src/Client.cc                      |  2 +-
+ parameters/src/Registry.cc                    | 14 +++++++-------
+ src/CIface_TEST.cc                            | 11 +++++------
+ src/HandlerStorage_TEST.cc                    |  7 ++++---
+ src/Node.cc                                   |  2 +-
+ src/Node_TEST.cc                              | 19 ++++++++++++-------
+ src/cmd/gz.cc                                 |  2 +-
+ test/integration/twoProcsPubSub.cc            |  7 ++++---
+ .../twoProcsPubSubSingleSubscriber_aux.cc     |  2 +-
+ .../twoProcsPubSubSubscriber_aux.cc           |  2 +-
+ 14 files changed, 56 insertions(+), 45 deletions(-)
+
+diff --git a/include/gz/transport/RepHandler.hh b/include/gz/transport/RepHandler.hh
+index a5675fca7..1f485f7a0 100644
+--- a/include/gz/transport/RepHandler.hh
++++ b/include/gz/transport/RepHandler.hh
+@@ -192,13 +192,13 @@ namespace ignition
+       // Documentation inherited.
+       public: virtual std::string ReqTypeName() const
+       {
+-        return Req().GetTypeName();
++        return std::string(Req().GetTypeName());
+       }
+ 
+       // Documentation inherited.
+       public: virtual std::string RepTypeName() const
+       {
+-        return Rep().GetTypeName();
++        return std::string(Rep().GetTypeName());
+       }
+ 
+       /// \brief Create a specific protobuf message given its serialized data.
+diff --git a/include/gz/transport/ReqHandler.hh b/include/gz/transport/ReqHandler.hh
+index 1f8b51c78..509d0dabb 100644
+--- a/include/gz/transport/ReqHandler.hh
++++ b/include/gz/transport/ReqHandler.hh
+@@ -284,13 +284,13 @@ namespace ignition
+       // Documentation inherited.
+       public: virtual std::string ReqTypeName() const
+       {
+-        return Req().GetTypeName();
++        return std::string(Req().GetTypeName());
+       }
+ 
+       // Documentation inherited.
+       public: virtual std::string RepTypeName() const
+       {
+-        return Rep().GetTypeName();
++        return std::string(Rep().GetTypeName());
+       }
+ 
+       /// \brief Protobuf message containing the request's parameters.
+@@ -381,7 +381,7 @@ namespace ignition
+       public: virtual std::string ReqTypeName() const
+       {
+         if (this->reqMsg)
+-          return this->reqMsg->GetTypeName();
++          return std::string(this->reqMsg->GetTypeName());
+         else
+         {
+           std::cerr << "ReqHandler::ReqTypeName() Warning: Using ReqTypeName() "
+@@ -394,7 +394,7 @@ namespace ignition
+       public: virtual std::string RepTypeName() const
+       {
+         if (this->repMsg)
+-          return this->repMsg->GetTypeName();
++          return std::string(this->repMsg->GetTypeName());
+         else
+         {
+           std::cerr << "ReqHandler::RepTypeName() Warning: Using RepTypeName() "
+diff --git a/include/gz/transport/SubscriptionHandler.hh b/include/gz/transport/SubscriptionHandler.hh
+index d69c83ddb..93c8ebad1 100644
+--- a/include/gz/transport/SubscriptionHandler.hh
++++ b/include/gz/transport/SubscriptionHandler.hh
+@@ -185,7 +185,7 @@ namespace ignition
+       // Documentation inherited.
+       public: std::string TypeName()
+       {
+-        return T().GetTypeName();
++        return std::string(T().GetTypeName());
+       }
+ 
+       /// \brief Set the callback for this handler.
+diff --git a/include/gz/transport/detail/Node.hh b/include/gz/transport/detail/Node.hh
+index 18859a6cf..bae3d0ae4 100644
+--- a/include/gz/transport/detail/Node.hh
++++ b/include/gz/transport/detail/Node.hh
+@@ -32,7 +32,8 @@ namespace ignition
+         const std::string &_topic,
+         const AdvertiseMessageOptions &_options)
+     {
+-      return this->Advertise(_topic, MessageT().GetTypeName(), _options);
++      return this->Advertise(_topic,
++          std::string(MessageT().GetTypeName()), _options);
+     }
+ 
+     //////////////////////////////////////////////////
+@@ -265,7 +266,8 @@ namespace ignition
+         this->Shared()->myReplierAddress,
+         this->Shared()->replierId.ToString(),
+         this->Shared()->pUuid, this->NodeUuid(),
+-        RequestT().GetTypeName(), ReplyT().GetTypeName(), _options);
++        std::string(RequestT().GetTypeName()),
++        std::string(ReplyT().GetTypeName()), _options);
+ 
+       if (!this->Shared()->AdvertisePublisher(publisher))
+       {
+@@ -418,8 +420,8 @@ namespace ignition
+         std::lock_guard<std::recursive_mutex> lk(this->Shared()->mutex);
+         localResponserFound = this->Shared()->repliers.FirstHandler(
+               fullyQualifiedTopic,
+-              RequestT().GetTypeName(),
+-              ReplyT().GetTypeName(),
++              std::string(RequestT().GetTypeName()),
++              std::string(ReplyT().GetTypeName()),
+               repHandler);
+       }
+ 
+@@ -456,7 +458,8 @@ namespace ignition
+         if (this->Shared()->TopicPublishers(fullyQualifiedTopic, addresses))
+         {
+           this->Shared()->SendPendingRemoteReqs(fullyQualifiedTopic,
+-            RequestT().GetTypeName(), ReplyT().GetTypeName());
++            std::string(RequestT().GetTypeName()),
++            std::string(ReplyT().GetTypeName()));
+         }
+         else
+         {
+@@ -549,7 +552,8 @@ namespace ignition
+       // If the responser is within my process.
+       IRepHandlerPtr repHandler;
+       if (this->Shared()->repliers.FirstHandler(fullyQualifiedTopic,
+-        _request.GetTypeName(), _reply.GetTypeName(), repHandler))
++        std::string(_request.GetTypeName()),
++        std::string(_reply.GetTypeName()), repHandler))
+       {
+         // There is a responser in my process, let's use it.
+         _result = repHandler->RunLocalCallback(_request, _reply);
+@@ -565,7 +569,8 @@ namespace ignition
+       if (this->Shared()->TopicPublishers(fullyQualifiedTopic, addresses))
+       {
+         this->Shared()->SendPendingRemoteReqs(fullyQualifiedTopic,
+-          _request.GetTypeName(), _reply.GetTypeName());
++          std::string(_request.GetTypeName()),
++          std::string(_reply.GetTypeName()));
+       }
+       else
+       {
+diff --git a/parameters/src/Client.cc b/parameters/src/Client.cc
+index 07fd0349a..9251ebcb9 100644
+--- a/parameters/src/Client.cc
++++ b/parameters/src/Client.cc
+@@ -215,7 +215,7 @@ ParametersClient::DeclareParameter(
+     return ParameterResult{
+       ParameterResultType::InvalidType,
+       _parameterName,
+-      _msg.GetDescriptor()->name()};
++      std::string(_msg.GetDescriptor()->name())};
+   }
+   return ParameterResult{ParameterResultType::Unexpected, _parameterName};
+ }
+diff --git a/parameters/src/Registry.cc b/parameters/src/Registry.cc
+index 0eaff3791..80642bddf 100644
+--- a/parameters/src/Registry.cc
++++ b/parameters/src/Registry.cc
+@@ -143,7 +143,7 @@ bool ParametersRegistryPrivate::ListParameters(const msgs::Empty &,
+       auto * decl = _res.add_parameter_declarations();
+       decl->set_name(paramPair.first);
+       decl->set_type(addIgnMsgsPrefix(
+-        paramPair.second->GetDescriptor()->name()));
++        std::string(paramPair.second->GetDescriptor()->name())));
+     }
+   }
+   return true;
+@@ -237,7 +237,7 @@ ParametersRegistry::DeclareParameter(
+   const std::string & _parameterName,
+   const google::protobuf::Message & _msg)
+ {
+-  auto protoType = addIgnMsgsPrefix(_msg.GetDescriptor()->name());
++  auto protoType = addIgnMsgsPrefix(std::string(_msg.GetDescriptor()->name()));
+   auto newParam = ignition::msgs::Factory::New(protoType);
+   if (!newParam) {
+     return ParameterResult{
+@@ -269,7 +269,7 @@ ParametersRegistry::Parameter(
+     return ParameterResult{
+       ParameterResultType::InvalidType,
+       _parameterName,
+-      addIgnMsgsPrefix(protoType)};
++      addIgnMsgsPrefix(std::string(protoType))};
+   }
+   _parameter.CopyFrom(*it->second);
+   return ParameterResult{ParameterResultType::Success};
+@@ -289,13 +289,12 @@ ParametersRegistry::Parameter(
+       _parameterName};
+   }
+   const auto & protoType = it->second->GetDescriptor()->name();
+-  _parameter = ignition::msgs::Factory::New(protoType);
++  _parameter = ignition::msgs::Factory::New(std::string(protoType));
+   if (!_parameter) {
+     return ParameterResult{
+       ParameterResultType::InvalidType,
+       _parameterName,
+-      addIgnMsgsPrefix(protoType)};
+-
++      addIgnMsgsPrefix(std::string(protoType))};
+   }
+   _parameter->CopyFrom(*it->second);
+   return ParameterResult{ParameterResultType::Success};
+@@ -319,7 +318,8 @@ ParametersRegistry::SetParameter(
+     return ParameterResult{
+       ParameterResultType::InvalidType,
+       _parameterName,
+-      addIgnMsgsPrefix(it->second->GetDescriptor()->name())};
++      std::string(addIgnMsgsPrefix(
++            std::string(it->second->GetDescriptor()->name())))};
+   }
+   it->second = std::move(_value);
+   return ParameterResult{ParameterResultType::Success};
+diff --git a/src/CIface_TEST.cc b/src/CIface_TEST.cc
+index 57eda1924..b6d30410c 100644
+--- a/src/CIface_TEST.cc
++++ b/src/CIface_TEST.cc
+@@ -93,8 +93,7 @@ TEST(CIfaceTest, PubSub)
+   msg.SerializeToArray(buffer, size);
+ 
+   EXPECT_EQ(0,
+-    ignTransportPublish(node, topic, buffer, msg.GetTypeName().c_str()));
+-
++    ignTransportPublish(node, topic, buffer, msg.GetTypeName().data()));
+   EXPECT_EQ(2, count);
+ 
+   count = 0;
+@@ -102,7 +101,7 @@ TEST(CIfaceTest, PubSub)
+   // Unsubscribe
+   ASSERT_EQ(0, ignTransportUnsubscribe(node, topic));
+   EXPECT_EQ(0,
+-    ignTransportPublish(node, topic, buffer, msg.GetTypeName().c_str()));
++    ignTransportPublish(node, topic, buffer, msg.GetTypeName().data()));
+   EXPECT_EQ(0, count);
+ 
+   free(buffer);
+@@ -150,12 +149,12 @@ TEST(CIfaceTest, PubSubPartitions)
+ 
+   // Publish on "bar" partition
+   EXPECT_EQ(0,
+-    ignTransportPublish(nodeBar, topic, buffer, msg.GetTypeName().c_str()));
++    ignTransportPublish(nodeBar, topic, buffer, msg.GetTypeName().data()));
+   EXPECT_EQ(1, count);
+ 
+   // Publish on default partition
+   EXPECT_EQ(0,
+-    ignTransportPublish(nodeBar, topic, buffer, msg.GetTypeName().c_str()));
++    ignTransportPublish(nodeBar, topic, buffer, msg.GetTypeName().data()));
+   EXPECT_EQ(2, count);
+ 
+   count = 0;
+@@ -163,7 +162,7 @@ TEST(CIfaceTest, PubSubPartitions)
+   // Unsubscribe
+   ASSERT_EQ(0, ignTransportUnsubscribe(nodeBar, topic));
+   EXPECT_EQ(0,
+-    ignTransportPublish(nodeBar, topic, buffer, msg.GetTypeName().c_str()));
++    ignTransportPublish(nodeBar, topic, buffer, msg.GetTypeName().data()));
+   EXPECT_EQ(0, count);
+ 
+   free(buffer);
+diff --git a/src/HandlerStorage_TEST.cc b/src/HandlerStorage_TEST.cc
+index e095e533e..54e3a5e15 100644
+--- a/src/HandlerStorage_TEST.cc
++++ b/src/HandlerStorage_TEST.cc
+@@ -66,8 +66,8 @@ TEST(RepStorageTest, RepStorageAPI)
+   msgs::Int32 rep1Msg;
+   bool result;
+   msgs::Vector3d reqMsg;
+-  std::string reqType = reqMsg.GetTypeName();
+-  std::string rep1Type = rep1Msg.GetTypeName();
++  std::string reqType = std::string(reqMsg.GetTypeName());
++  std::string rep1Type = std::string(rep1Msg.GetTypeName());
+ 
+   reqMsg.set_x(1.0);
+   reqMsg.set_y(2.0);
+@@ -231,7 +231,8 @@ TEST(RepStorageTest, SubStorageNoCallbacks)
+   EXPECT_FALSE(subs.FirstHandler(topic, "incorrect type", handler));
+ 
+   // Now try to retrieve the first callback with the correct type.
+-  EXPECT_TRUE(subs.FirstHandler(topic, msg.GetTypeName(), handler));
++  EXPECT_TRUE(subs.FirstHandler(topic,
++        std::string(msg.GetTypeName()), handler));
+ 
+   // Verify the handler.
+   EXPECT_EQ(handler->TypeName(), sub1HandlerPtr->TypeName());
+diff --git a/src/Node.cc b/src/Node.cc
+index 58126ed60..423d257c3 100644
+--- a/src/Node.cc
++++ b/src/Node.cc
+@@ -423,7 +423,7 @@ bool Node::Publisher::Publish(const ProtoMsg &_msg)
+     };
+ 
+     if (!this->dataPtr->shared->Publish(this->dataPtr->publisher.Topic(),
+-          msgBuffer, msgSize, myDeallocator, _msg.GetTypeName()))
++          msgBuffer, msgSize, myDeallocator, std::string(_msg.GetTypeName())))
+     {
+       return false;
+     }
+diff --git a/src/Node_TEST.cc b/src/Node_TEST.cc
+index d3a8709e5..6d126f189 100644
+--- a/src/Node_TEST.cc
++++ b/src/Node_TEST.cc
+@@ -344,8 +344,9 @@ class MyTestClass
+     // Request a valid service using RequestRaw.
+     std::string reqStr, repStr, repTypeName;
+     req.SerializeToString(&reqStr);
+-    EXPECT_TRUE(this->node.RequestRaw(g_topic, reqStr, req.GetTypeName(),
+-          rep.GetTypeName(), timeout, repStr, result));
++    EXPECT_TRUE(this->node.RequestRaw(g_topic, reqStr,
++          std::string(req.GetTypeName()),
++          std::string(rep.GetTypeName()), timeout, repStr, result));
+     rep.ParseFromString(repStr);
+     ASSERT_TRUE(result);
+     EXPECT_EQ(rep.data(), data);
+@@ -539,7 +540,7 @@ TEST(NodeTest, PubWithoutAdvertise)
+   EXPECT_TRUE(node1.SubscribedTopics().empty());
+   EXPECT_TRUE(node1.AdvertisedServices().empty());
+ 
+-  auto pub1 = node1.Advertise(g_topic, msg.GetTypeName());
++  auto pub1 = node1.Advertise(g_topic, std::string(msg.GetTypeName()));
+   EXPECT_TRUE(pub1);
+ 
+   auto advertisedTopics = node1.AdvertisedTopics();
+@@ -728,7 +729,8 @@ TEST(NodeTest, RawPubSubSameThreadMessageInfo)
+   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+ 
+   // Publish a first message.
+-  EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(), msg.GetTypeName()));
++  EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(),
++        std::string(msg.GetTypeName())));
+ 
+   // Give some time to the subscribers.
+   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+@@ -739,7 +741,8 @@ TEST(NodeTest, RawPubSubSameThreadMessageInfo)
+   reset();
+ 
+   // Publish a second message on topic.
+-  EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(), msg.GetTypeName()));
++  EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(),
++        std::string(msg.GetTypeName())));
+ 
+   // Give some time to the subscribers.
+   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+@@ -768,7 +771,8 @@ TEST(NodeTest, RawPubRawSubSameThreadMessageInfo)
+   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+ 
+   // Publish a first message.
+-  EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(), msg.GetTypeName()));
++  EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(),
++        std::string(msg.GetTypeName())));
+ 
+   // Give some time to the subscribers.
+   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+@@ -779,7 +783,8 @@ TEST(NodeTest, RawPubRawSubSameThreadMessageInfo)
+   reset();
+ 
+   // Publish a second message on topic.
+-  EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(), msg.GetTypeName()));
++  EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(),
++        std::string(msg.GetTypeName())));
+ 
+   // Give some time to the subscribers.
+   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+diff --git a/src/cmd/gz.cc b/src/cmd/gz.cc
+index 01b40b4eb..06660461e 100644
+--- a/src/cmd/gz.cc
++++ b/src/cmd/gz.cc
+@@ -164,7 +164,7 @@ extern "C" void cmdTopicPub(const char *_topic,
+   {
+     // Create the node and advertise the topic
+     Node node;
+-    auto pub = node.Advertise(_topic, msg->GetTypeName());
++    auto pub = node.Advertise(_topic, std::string(msg->GetTypeName()));
+ 
+     // Publish the message
+     if (pub)
+diff --git a/test/integration/twoProcsPubSub.cc b/test/integration/twoProcsPubSub.cc
+index d0cefccb6..dcacaf286 100644
+--- a/test/integration/twoProcsPubSub.cc
++++ b/test/integration/twoProcsPubSub.cc
+@@ -170,7 +170,8 @@ TEST(twoProcPubSub, RawPubSubTwoProcsThreeNodes)
+   // Publish messages for a few seconds
+   for (auto i = 0; i < 10; ++i)
+   {
+-    EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(), msg.GetTypeName()));
++    EXPECT_TRUE(pub.PublishRaw(msg.SerializeAsString(),
++          std::string(msg.GetTypeName())));
+     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+   }
+ 
+@@ -220,7 +221,7 @@ TEST(twoProcPubSub, PubRawSubWrongTypesOnSubscription)
+ 
+   transport::Node node;
+   EXPECT_TRUE(node.SubscribeRaw(g_topic, cbRaw,
+-                                msgs::Int32().GetTypeName()));
++                                std::string(msgs::Int32().GetTypeName())));
+ 
+   // Wait some time before publishing.
+   std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+@@ -319,7 +320,7 @@ TEST(twoProcPubSub, PubSubWrongTypesTwoRawSubscribers)
+   transport::Node node3;
+   EXPECT_TRUE(node1.SubscribeRaw(g_topic, wrongCb, "wrong.msg.type"));
+   EXPECT_TRUE(node2.SubscribeRaw(g_topic, correctCb,
+-                                 msgs::Vector3d().GetTypeName()));
++                                 std::string(msgs::Vector3d().GetTypeName())));
+   EXPECT_TRUE(node3.SubscribeRaw(g_topic, genericCb));
+ 
+ 
+diff --git a/test/integration/twoProcsPubSubSubscriber_aux.cc b/test/integration/twoProcsPubSubSubscriber_aux.cc
+index c5c0d108d..d0d5719eb 100644
+--- a/test/integration/twoProcsPubSubSubscriber_aux.cc
++++ b/test/integration/twoProcsPubSubSubscriber_aux.cc
+@@ -99,7 +99,7 @@ void runSubscriber()
+ 
+   // Add a raw subscription to `node`
+   EXPECT_TRUE(node.SubscribeRaw(g_topic, cbRaw,
+-                                msgs::Vector3d().GetTypeName()));
++                                std::string(msgs::Vector3d().GetTypeName())));
+ 
+   int interval = 100;
+ 
