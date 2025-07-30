@@ -12,6 +12,7 @@ source:
     sha256: dad9553f68076c466a5fa4d575c1910b13a6b32e7dfe3e29e81f93ae5bec07ac
     patches:
       - 620.patch
+      - 674.patch
 
 build:
   number: 11
