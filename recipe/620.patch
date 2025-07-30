@@ -427,19 +427,6 @@ index d0cefccb6..dcacaf286 100644
    EXPECT_TRUE(node3.SubscribeRaw(g_topic, genericCb));
  
  
-diff --git a/test/integration/twoProcsPubSubSingleSubscriber_aux.cc b/test/integration/twoProcsPubSubSingleSubscriber_aux.cc
-index bf548604e..94c8265a5 100644
---- a/test/integration/twoProcsPubSubSingleSubscriber_aux.cc
-+++ b/test/integration/twoProcsPubSubSingleSubscriber_aux.cc
-@@ -69,7 +69,7 @@ void runSubscriber()
- 
-   // Add a raw subscription to `node`
-   EXPECT_TRUE(node.SubscribeRaw(g_topic, cbRaw,
--                                msgs::Vector3d().GetTypeName()));
-+                                std::string(msgs::Vector3d().GetTypeName())));
- 
-   int interval = 100;
- 
 diff --git a/test/integration/twoProcsPubSubSubscriber_aux.cc b/test/integration/twoProcsPubSubSubscriber_aux.cc
 index c5c0d108d..d0d5719eb 100644
 --- a/test/integration/twoProcsPubSubSubscriber_aux.cc
