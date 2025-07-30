@@ -1,0 +1,116 @@
+From 43b560e7dc573fd1b6c2a420c4e2541e0e2cbb71 Mon Sep 17 00:00:00 2001
+From: Silvio Traversaro <silvio@traversaro.it>
+Date: Wed, 30 Jul 2025 15:50:20 +0200
+Subject: [PATCH] Fix support for protobuf 28
+
+---
+ include/gz/transport/RepHandler.hh          | 46 ++++++++++++++++++++-
+ include/gz/transport/SubscriptionHandler.hh | 24 ++++++++++-
+ 2 files changed, 68 insertions(+), 2 deletions(-)
+
+diff --git a/include/gz/transport/RepHandler.hh b/include/gz/transport/RepHandler.hh
+index 1f485f7a..4ac0f320 100644
+--- a/include/gz/transport/RepHandler.hh
++++ b/include/gz/transport/RepHandler.hh
+@@ -140,7 +140,12 @@ namespace ignition
+           return false;
+         }
+ 
+-#if GOOGLE_PROTOBUF_VERSION >= 4022000
++#if GOOGLE_PROTOBUF_VERSION >= 5028000
++        const auto msgReq =
++          google::protobuf::DynamicCastMessage<Req>(&_msgReq);
++        auto msgRep =
++          google::protobuf::DynamicCastMessage<Rep>(&_msgRep);
++#elif GOOGLE_PROTOBUF_VERSION >= 4022000
+         auto msgReq =
+           google::protobuf::internal::DownCast<const Req*>(&_msgReq);
+         auto msgRep = google::protobuf::internal::DownCast<Rep*>(&_msgRep);
+@@ -153,6 +158,45 @@ namespace ignition
+         auto msgRep = google::protobuf::internal::down_cast<Rep*>(&_msgRep);
+ #endif
+ 
++        // Verify the dynamically casted messages are valid
++        if (msgReq == nullptr || msgRep == nullptr)
++        {
++          if (msgReq == nullptr)
++          {
++            if (_msgReq.GetDescriptor() != nullptr)
++            {
++              std::cerr << "RepHandler::RunLocalCallback() error: "
++                        << "Failed to cast the request of the type "
++                        << _msgReq.GetDescriptor()->full_name()
++                        << " to the specified type" << '\n';
++            }
++            else
++            {
++              std::cerr << "RepHandler::RunLocalCallback() error: "
++                        << "Failed to cast the request of an unknown type"
++                        << " to the specified type" << '\n';
++            }
++          }
++          if (msgRep == nullptr)
++          {
++            if (_msgRep.GetDescriptor() != nullptr)
++            {
++              std::cerr << "RepHandler::RunLocalCallback() error: "
++                        << "Failed to cast the response of the type "
++                        << _msgRep.GetDescriptor()->full_name()
++                        << " to the specified type" << '\n';
++            }
++            else
++            {
++              std::cerr << "RepHandler::RunLocalCallback() error: "
++                        << "Failed to cast the response of an unknown type"
++                        << " to the specified type" << '\n';
++            }
++          }
++          std::cerr.flush();
++          return false;
++        }
++
+         return this->cb(*msgReq, *msgRep);
+       }
+ 
+diff --git a/include/gz/transport/SubscriptionHandler.hh b/include/gz/transport/SubscriptionHandler.hh
+index 93c8ebad..792a9029 100644
+--- a/include/gz/transport/SubscriptionHandler.hh
++++ b/include/gz/transport/SubscriptionHandler.hh
+@@ -211,7 +211,9 @@ namespace ignition
+         if (!this->UpdateThrottling())
+           return true;
+ 
+-#if GOOGLE_PROTOBUF_VERSION >= 4022000
++#if GOOGLE_PROTOBUF_VERSION >= 5028000
++        auto msgPtr = google::protobuf::DynamicCastMessage<T>(&_msg);
++#elif GOOGLE_PROTOBUF_VERSION >= 4022000
+         auto msgPtr = google::protobuf::internal::DownCast<const T*>(&_msg);
+ #elif GOOGLE_PROTOBUF_VERSION >= 3000000
+         auto msgPtr = google::protobuf::down_cast<const T*>(&_msg);
+@@ -219,6 +221,26 @@ namespace ignition
+         auto msgPtr = google::protobuf::internal::down_cast<const T*>(&_msg);
+ #endif
+ 
++        // Verify the dynamically casted message is valid
++        if (msgPtr == nullptr)
++        {
++          if (_msg.GetDescriptor() != nullptr)
++          {
++            std::cerr << "SubscriptionHandler::RunLocalCallback() error: "
++                      << "Failed to cast the message of the type "
++                      << _msg.GetDescriptor()->full_name()
++                      << " to the specified type" << '\n';
++          }
++          else
++          {
++            std::cerr << "SubscriptionHandler::RunLocalCallback() error: "
++                      << "Failed to cast the message of an unknown type"
++                      << " to the specified type" << '\n';
++          }
++          std::cerr.flush();
++          return false;
++        }
++
+         this->cb(*msgPtr, _info);
+         return true;
+       }
