@@ -13,6 +13,7 @@ source:
     patches:
       - 405.patch
       - 406.patch
+      - protobuf30.patch
 
 build:
   number: 16
